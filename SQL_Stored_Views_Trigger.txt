@@ -1,0 +1,134 @@
+create database data;
+
+create table cust (
+    cus_id int primary key,
+    name varchar(30),
+    city varchar(30)
+);
+
+create table account(
+    acc_id int primary key,
+    cus_id int,
+    balance decimal(10,2),
+    foreign key(cus_id) references cust(cus_id)
+);
+
+insert into cust values
+(1,'Ram','Hyderabad'),
+(2,'Siri','Bangalore'),
+(3,'Sita','Chennai');
+
+insert into account values
+(101,1,5000),
+(102,2,7000),
+(103,3,9000);
+
+select c.cus_id,c.name,c.city,a.acc_id,a.balance
+from cust c
+inner join account a
+on c.cus_id = a.cus_id;
+
+alter table account add ac_name varchar(30);
+
+
+alter table account drop column ac_name ;
+alter table account drop column cus_id ;
+alter table account add cus_name varchar(30);
+
+update account set cus_name ='Ram' where cus_id =1;
+update account set cus_name ='Siri' where cus_id =2;
+update account set cus_name ='Sita' where cus_id =3;
+
+select * from account;
+
+
+
+create view  ac_name as
+select c.name as customer_name,
+       a.acc_id,
+       a.balance
+from cust c
+left join account a
+on c.cus_id = a.cus_id;
+
+select * from ac_name;
+
+select * from account;
+
+select * from cust;
+
+-- stored procedures
+
+delimiter //
+create procedure get_acc1()
+begin
+select * from account;
+end //
+delimiter ;
+
+call get_acc1();
+
+
+delimiter //
+
+DELIMITER //
+
+CREATE PROCEDURE get_name5(
+    IN cus_name1 VARCHAR(30)
+    -- IN bal DECIMAL(10,2)
+)
+BEGIN
+    SELECT *
+    FROM account
+    WHERE cus_name = cus_name1;
+      -- AND balance = bal;
+END //
+
+DELIMITER ;
+call get_name5('Ram');
+
+DESC account;
+
+-- Triggers
+
+select * from account;
+use bank1;
+
+
+CREATE TABLE employee (
+    e_id INT PRIMARY KEY AUTO_INCREMENT,
+    e_name VARCHAR(30),
+    salary INT
+);
+
+CREATE TABLE emp_msg (
+    message VARCHAR(100)
+);
+
+DELIMITER //
+
+CREATE TRIGGER employee_insert_trigger
+AFTER INSERT
+ON employee
+FOR EACH ROW
+BEGIN
+    INSERT INTO emp_msg
+    VALUES (CONCAT('New Employee Added: ', NEW.e_name));
+END //
+
+DELIMITER ;
+
+SHOW TRIGGERS;
+
+INSERT INTO employee(e_name, salary)
+VALUES ('Charan', 25000);
+
+SELECT * FROM employee;
+
+SELECT * FROM emp_msg;
+
+INSERT INTO employee(e_name, salary)
+VALUES ('Siri', 30000);
+
+SELECT * FROM emp_msg;
+
